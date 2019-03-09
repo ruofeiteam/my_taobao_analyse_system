@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Taobao Serach</title>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <script>
+        {#AJAX传递URL#}
+        function post_taobao_url() {
+            htmlobj = $.ajax(
+                {
+                    url:"get_taobao_url/",
+                    timeout:1000,
+                    data:{csrfmiddlewaretoken:'{{ csrf_token }}',
+                    taobao_url:$("#input_url").val()},
+                    type:"post",
+                    success:function(result) {
+                        console.log(result);
+                        console.log("写入成功！");
+                        $("#test_request").html(result);
+                    }
+                }
+            )
+
+
+        }
+    </script>
+</head>
+<body>
+    {% csrf_token %}
+
+
+    <form role="form">
+	<div class="form-group">
+		<label for="name">请输入URL</label>
+		<textarea class="form-control" rows="3" id="input_url"></textarea>
+        <button type="button" class="btn btn-primary" onclick="post_taobao_url()">提交按钮</button>
+        <p id="test_request"></p>
+	</div>
+    </form>
+
+</body>
+</html>
