@@ -26,6 +26,6 @@ class Taobao(models.Model):   #创建商品信息
 
 class Spider(models.Model):    #创建评论信息
     spider_id = models.CharField(max_length=50)
-    spider_detail_Common = models.CharField(max_length=1200)
+    spider_detail_Common = models.CharField(max_length=3000)
     spider_detail_All = models.TextField()
     spider_time = models.DateField(auto_now_add=True)

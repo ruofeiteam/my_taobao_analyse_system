@@ -6,6 +6,7 @@ from django.views.decorators import csrf
 import requests
 from MyModel.models import Taobao
 from django.http import HttpResponse
+from .taobao_spider import start_thread
 
 
 def mian_taobao(request):
@@ -42,6 +43,12 @@ def search_post(request):  # 接收ajax
         if_new_taobao_id = Taobao.objects.filter(taobao_id=taobao_id[0])
         if if_new_taobao_id:  #数据库中存在相应信息，直接返回
             ctx = Taobao.objects.filter(taobao_id=taobao_id[0]).values('taobao_name')
+
+            #
+            #取结果
+            #
+
+            start_thread(taobao_id[0])  #防止意外存入taobao未存入spider
             return HttpResponse(ctx)
             # update_taobao_info = Taobao.objects.get(taobao_id=taobao_id[0])
             # update_taobao_info.taobao_price_now = taobao_price_now[0]
@@ -57,6 +64,8 @@ def search_post(request):  # 接收ajax
             taobao_add.taobao_id = taobao_id[0]
             taobao_add.taobao_name = taobao_name[0]
             taobao_add.save()
+
+            start_thread(taobao_id[0])
             ctx = "Success，等待分析"
             #加入线程池
 
@@ -67,4 +76,3 @@ def search_post(request):  # 接收ajax
         return HttpResponse(ctx)
 
 
-    # print(taobao_shop_name[0].encode('ascii').decode('unicode_escape'))  #ascii解码
