@@ -6,7 +6,8 @@ from django.views.decorators import csrf
 import requests
 from MyModel.models import Taobao
 from django.http import HttpResponse
-from .taobao_spider import start_thread
+from .taobao_spider import start_thread_spider
+
 
 
 def mian_taobao(request):
@@ -48,14 +49,8 @@ def search_post(request):  # 接收ajax
             #取结果
             #
 
-            start_thread(taobao_id[0])  #防止意外存入taobao未存入spider
+            start_thread_spider(taobao_id[0])  #防止意外存入taobao未存入spider
             return HttpResponse(ctx)
-            # update_taobao_info = Taobao.objects.get(taobao_id=taobao_id[0])
-            # update_taobao_info.taobao_price_now = taobao_price_now[0]
-            # update_taobao_info.taobao_shop_name = taobao_shop_name[0]
-            # update_taobao_info.taobao_url = taobao_url
-            # update_taobao_info.taobao_name = taobao_name[0]
-            # update_taobao_info.save()
         else:             #不存在，加入数据库，加入爬取池
             taobao_add = Taobao()
             taobao_add.taobao_price_now = taobao_price_now[0]
@@ -65,7 +60,7 @@ def search_post(request):  # 接收ajax
             taobao_add.taobao_name = taobao_name[0]
             taobao_add.save()
 
-            start_thread(taobao_id[0])
+            start_thread_spider(taobao_id[0])
             ctx = "Success，等待分析"
             #加入线程池
 

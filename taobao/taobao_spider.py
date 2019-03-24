@@ -6,6 +6,7 @@ import json
 
 from MyModel.models import Spider
 import threading
+from .taobao_analyse import start_thread_analyse
 
 
 def Comment_Spider(taobao_id):  # 获取总体评价
@@ -44,9 +45,13 @@ def All_Spider(taobao_id):  # 获取所有评论
         else:
             break
 
-    # print(json.dumps(list_content, ensure_ascii=False))
+
+    #加入分析
+    start_thread_analyse(list_content,taobao_id)
+    #
     return (json.dumps(list_content))
-    # 存入spider数据库  #明日计划/增加线程池/增加数据库表（类似CMD5，读入id存在直接返回，不存在加入线程池加入数据库，等下次使用或邮件告知）
+    # return (list_content)
+
 
 
 def save_common_mysql(taobao_id):
@@ -54,21 +59,21 @@ def save_common_mysql(taobao_id):
 
     if_new_spider_id = Spider.objects.filter(spider_id=taobao_id)
     if if_new_spider_id:  # 数据库中存在相应信息，直接返回
-        print("已存在")
+        print("爬虫数据已存在")
     else:  # 不存在，存入数据库
         detail_comment_json = Comment_Spider(taobao_id)  # 爬取
         all_ages_json = All_Spider(taobao_id)
 
         if_new_spider_id = Spider.objects.filter(spider_id=taobao_id)
         if if_new_spider_id:  # 数据库中存在相应信息，直接返回
-            print("已存在")
+            print("爬虫数据已存在")
         else:  # 不存在，存入数据库
             spider_add = Spider()
             spider_add.spider_id = taobao_id
             spider_add.spider_detail_Common = detail_comment_json
             spider_add.spider_detail_All = all_ages_json
             spider_add.save()
-            print("保存完毕")
+            print("爬虫数据保存完毕")
 
 
 ############################################多线程
@@ -82,7 +87,7 @@ class myThread(threading.Thread):
         # 获取锁，用于线程同步
         threadLock.acquire()
         save_common_mysql(self.taobao_id)
-        # 释放锁，开启下一个线程
+        # 释放锁，开启下一个线程start_thread
         threadLock.release()
 
 
@@ -90,7 +95,7 @@ threadLock = threading.Lock()
 threads = []
 
 
-def start_thread(taobao_id):
+def start_thread_spider(taobao_id):
     # 创建新线程
     thread = myThread(taobao_id)
 

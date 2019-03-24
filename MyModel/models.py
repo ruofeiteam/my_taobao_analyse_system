@@ -29,3 +29,10 @@ class Spider(models.Model):    #创建评论信息
     spider_detail_Common = models.CharField(max_length=3000)
     spider_detail_All = models.TextField()
     spider_time = models.DateField(auto_now_add=True)
+
+
+class Analyse(models.Model):   #评论分析结果
+    analyse_id = models.CharField(max_length=50)
+    analyse_positive_prob = models.TextField()
+    analyse_negative_prob = models.TextField()
+    analyse_time = models.DateField(auto_now_add=True)
