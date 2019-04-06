@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分析图表</title>
+
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+{#    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>#}
+{#    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.js"></script>#}
+    {% load static %}
+    <script src="{% static "js/Chart.js" %}"></script>
+
+
+    <style>
+     #abcd {
+        position: relative;
+        width: 400px;
+        height: 400px;
+      }
+    </style>
+
+</head>
+<body>
+
+    {% csrf_token %}
+
+    {#创建容器#}
+    <div id="abcd"><canvas id="popChart"></canvas></div>
+
+    <script>
+        {#画图表#}
+        var popCanvas = $("#popChart");
+        var popCanvas = document.getElementById("popChart");
+        var popCanvas = document.getElementById("popChart").getContext("2d");
+        var barChart = new Chart(popCanvas, {
+            type: 'bar',
+            data: {
+              labels: {{ json }},
+              datasets: [{
+                fillColor : "rgba(220,220,220,0.5)",
+                label: '评分',
+                data: {{ json }},
+                backgroundColor: [
+                    {% autoescape off %}
+                    {{ color }}
+                    {% endautoescape %}
+                ]
+              }]
+            }
+          });
+    </script>
+</body>
+</html>

@@ -9,7 +9,24 @@
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 
+
     <script>
+
+        {#设置iframe自动适应高度宽度#}
+        function setIframeSize(iframe) {
+            if (iframe) {
+                var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+                if (iframeWin.document.body) {
+                    iframe.height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
+                    iframe.width = iframeWin.document.documentElement.scrollWidth || iframeWin.document.body.scrollWidth;
+                }
+            }
+            };
+
+            window.onload = function () {
+                setIframeSize(document.getElementById('external-frame'));
+            };
+
         {#AJAX传递URL#}
         function post_taobao_url() {
             htmlobj = $.ajax(
@@ -21,13 +38,11 @@
                     type:"post",
                     success:function(result) {
                         console.log(result);
-                        console.log("写入成功！");
+                        console.log("发送成功！");
                         $("#test_request").html(result);
                     }
                 }
             )
-
-
         }
     </script>
 </head>
@@ -35,6 +50,7 @@
     {% csrf_token %}
 
 
+{#    提交窗口#}
     <form role="form">
 	<div class="form-group">
 		<label for="name">请输入URL</label>
@@ -42,6 +58,12 @@
         <button type="button" class="btn btn-primary" onclick="post_taobao_url()">提交按钮</button>
         <p id="test_request"></p>
 	</div>
+
+
+{#        嵌入图表#}
+{#    <iframe src="http://127.0.0.1:8000/analyse/" width="600" height="300" frameborder="0" scrolling="yes" allowtransparency="yes"></iframe>#}
+        <iframe src="analyse/" frameborder="0" scrolling="no" id="external-frame" onload="setIframeSize(this)"></iframe>
+
     </form>
 
 </body>

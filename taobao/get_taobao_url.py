@@ -47,6 +47,8 @@ def search_post(request):  # 接收ajax
 
             #
             #取结果
+            ctx = "正在读取结果"
+            return HttpResponse(ctx)
             #
 
             start_thread_spider(taobao_id[0])  #防止意外存入taobao未存入spider
@@ -61,13 +63,13 @@ def search_post(request):  # 接收ajax
             taobao_add.save()
 
             start_thread_spider(taobao_id[0])
-            ctx = "Success，等待分析"
+            ctx = "未找到结果，等待分析，请稍后再试"
             #加入线程池
 
 
             return HttpResponse(ctx)
 
-        ctx = "other"
+        ctx = "未知错误，联系管理员"
         return HttpResponse(ctx)
 
 
