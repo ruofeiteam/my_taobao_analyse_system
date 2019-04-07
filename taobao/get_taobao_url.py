@@ -43,8 +43,7 @@ def search_post(request):  # 接收ajax
 
         if_new_taobao_id = Taobao.objects.filter(taobao_id=taobao_id[0])
         if if_new_taobao_id:  #数据库中存在相应信息，直接返回
-            ctx = Taobao.objects.filter(taobao_id=taobao_id[0]).values('taobao_name')
-
+            # ctx = Taobao.objects.filter(taobao_id=taobao_id[0]).values('taobao_name')
             #
             #取结果
             ctx = "正在读取结果"
@@ -71,5 +70,6 @@ def search_post(request):  # 接收ajax
 
         ctx = "未知错误，联系管理员"
         return HttpResponse(ctx)
-
+    ctx = "不支持的方法"
+    return HttpResponse(ctx)
 

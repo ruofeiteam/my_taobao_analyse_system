@@ -27,7 +27,7 @@ urlpatterns = [
     path('', get_taobao_url.mian_taobao),
     path('get_taobao_url/', get_taobao_url.search_post),
     path('get_json/',get_json_file.get_json_url),
-    path('analyse/',get_json_file.get_json_url_html),
+    path('analyse/',get_json_file.get_iframe_html),
     path('favicon.ico',RedirectView.as_view(url=r'static/images/favicon.ico')),
 ]
 

@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>分析图表</title>
+    <title>分析结果图表</title>
 
 
-    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-{#    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>#}
-{#    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.js"></script>#}
     {% load static %}
     <script src="{% static "js/Chart.js" %}"></script>
 
@@ -16,7 +13,7 @@
      #abcd {
         position: relative;
         width: 400px;
-        height: 400px;
+        {#height: 200px;#}
       }
     </style>
 
@@ -24,31 +21,61 @@
 <body>
 
     {% csrf_token %}
-
-    {#创建容器#}
+    <div><h1>宝贝名称</h1></div>
+{#    创建容器#}
     <div id="abcd"><canvas id="popChart"></canvas></div>
+    <div id="abcd"><canvas id="pieChart"></canvas></div>
 
     <script>
-        {#画图表#}
-        var popCanvas = $("#popChart");
-        var popCanvas = document.getElementById("popChart");
+        {#画柱状图#}
         var popCanvas = document.getElementById("popChart").getContext("2d");
         var barChart = new Chart(popCanvas, {
             type: 'bar',
             data: {
-              labels: {{ json }},
+                labels: [{{ barlables }}],
+                datasets: [{
+                    fillColor : "rgba(0,0,0,0.5)",
+                    label: '评论分值排列',
+                    data: [{{ bardata }}],
+                    backgroundColor: [
+                        {% autoescape off %}
+                            {{ barcolor }}
+                        {% endautoescape %}
+                    ]
+                }]
+            },
+            options:{
+                legend:{display:false},
+                title: {
+                    display: true,
+                    text: '好评度分布'
+                }
+            }
+        });
+
+
+        {#画饼图#}
+        var pieCanvas = document.getElementById("pieChart").getContext("2d");
+        var pieChart = new Chart(pieCanvas, {
+            type: 'pie',
+            data: {
+              labels: {% autoescape off %}{{ pielables }}{% endautoescape %},
               datasets: [{
                 fillColor : "rgba(220,220,220,0.5)",
                 label: '评分',
-                data: {{ json }},
+                data: {% autoescape off %}{{ piedata }}{% endautoescape %},
                 backgroundColor: [
                     {% autoescape off %}
-                    {{ color }}
+                    {{ piecolor }}
                     {% endautoescape %}
                 ]
               }]
             }
-          });
+        });
+
+
     </script>
 </body>
 </html>
+
+
