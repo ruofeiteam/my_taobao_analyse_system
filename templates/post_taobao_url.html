@@ -8,7 +8,9 @@
 	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-
+    <style>
+    .box{width: 800px;height: auto;margin: 0 auto;}
+    </style>
 
     <script>
 
@@ -28,21 +30,65 @@
             };
 
         {#AJAX传递URL#}
-        function post_taobao_url() {
+        function send_url() {
+            if ($("#cbCheckbox1").val() == "true"){
+                var email = $("#emailinput").val();
+                if (email == ""){
+                    alert("请输入邮箱或取消勾选")
+                    $("#emailinput").val('');
+                    return
+                }
+                else if (email != ""){
+                    var reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                    isok = reg.test(email);
+                    if(!isok){
+                        alert("邮箱格式不正确，请重新输入！")
+                        $("#emailinput").val('');
+                        return false
+                    }else {
+                        ajax_post(email)
+                    }
+                }
+            }else if ($("#cbCheckbox1").val() == "false"){
+                var email = "none"
+                ajax_post(email)
+            }
+            else {
+                console.log("准备发送ajax请求时未知错误")
+            }
+        }
+        function ajax_post(email) {
             htmlobj = $.ajax(
                 {
                     url:"get_taobao_url/",
                     timeout:1000,
                     data:{csrfmiddlewaretoken:'{{ csrf_token }}',
-                    taobao_url:$("#input_url").val()},
+                    taobao_url:$("#input_url").val(),
+                    email:email},
                     type:"post",
                     success:function(result) {
-                        console.log(result);
                         console.log("发送成功！");
-                        $("#test_request").html(result);
+                        console.log(result);
+                        {#$("#request_id").html(result);#}
+                        var patrn = /^(-)?\d+(\.\d+)?$/;
+                        if (patrn.exec(result) == null || result == "") {
+                            return false
+                        } else {
+                            $("ol").append("<iframe src=\"analyse/?taobao_id="+result+"\" frameborder=\"0\" scrolling=\"no\" id=\"external-frame\" onload=\"setIframeSize(this)\"></iframe>");
+                            console.log("生产iframe成功！");
+                            return true
+                        }
                     }
                 }
             )
+        }
+
+        {#清空结果#}
+        function clear_iframe() {
+            console.log("按下清除");
+            $("#ol1").remove();
+            $("p").after("<ol id=\"ol1\"></ol>");
+            $("#input_url").val('');
         }
     </script>
 </head>
@@ -53,18 +99,41 @@
 {#    提交窗口#}
     <form role="form">
 	<div class="form-group">
-		<label for="name">请输入URL</label>
-		<textarea class="form-control" rows="3" id="input_url"></textarea>
-        <button type="button" class="btn btn-primary" onclick="post_taobao_url()">提交按钮</button>
-        <p id="test_request"></p>
+        <div class="box">
+            <label for="name">请输入URL</label>
+            <textarea class="form-control" rows="8" id="input_url"></textarea>
+            <ol2><input type="checkbox" id="cbCheckbox1" value="false" />请勾选以填写邮箱</ol2>
+
+            <div>
+                <button type="button" class="btn btn-primary" onclick="send_url()">提交按钮</button>
+                <button type="button" class="btn btn-primary" onclick="clear_iframe()">清除结果</button>
+            </div>
+        </div>
+        <p id="request_id"></p>
+        <ol id="ol1"></ol>
+
 	</div>
 
 
 {#        嵌入图表#}
-{#    <iframe src="http://127.0.0.1:8000/analyse/" width="600" height="300" frameborder="0" scrolling="yes" allowtransparency="yes"></iframe>#}
-        <iframe src="analyse/?taobao_id=569931218730" frameborder="0" scrolling="no" id="external-frame" onload="setIframeSize(this)"></iframe>
+
+{#        <iframe src="analyse/?taobao_id=569931218730" frameborder="0" scrolling="no" id="external-frame" onload="setIframeSize(this)"></iframe>#}
 
     </form>
 
 </body>
 </html>
+
+<script type="text/javascript">
+
+    $("#cbCheckbox1").click(function () {
+        if ($(this).prop("checked")) {
+        	$("ol2").append("<div id = \"divbr\">在此处填写您的邮箱，将会在分析结束后及时得到邮件提醒：<input type=\"email\" id=\"emailinput\" placeholder=\"test@example.com\"></div>")
+            $("#cbCheckbox1").val("true");
+        } else {
+            $("#divbr").remove();
+            $("#cbCheckbox1").val("false");
+        }
+    });
+
+</script>

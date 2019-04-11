@@ -5,6 +5,7 @@ import re
 from django.views.decorators import csrf
 import requests
 from MyModel.models import Taobao
+from MyModel.models import Mail
 from django.http import HttpResponse
 from .taobao_spider import start_thread_spider
 
@@ -17,9 +18,17 @@ def mian_taobao(request):
 def search_post(request):  # 接收ajax
     if request.POST:
         taobao_url = request.POST['taobao_url']
+        print("url：" + taobao_url)
+        email = request.POST['email']
+        print("email：" + email)
 
         if_taobao_url = r"https://item.taobao.com/item.htm"  # 判断是否为正确url
         if if_taobao_url != taobao_url[0:len(if_taobao_url)]:
+
+            # taobao_id = "123456"
+            # email = "1237456"
+            # print(save_email(taobao_id, email))
+
             ctx = "Not a valid URL,当前仅支持淘宝评论分析"
             return HttpResponse(ctx)
 
@@ -43,12 +52,11 @@ def search_post(request):  # 接收ajax
 
         if_new_taobao_id = Taobao.objects.filter(taobao_id=taobao_id[0])
         if if_new_taobao_id:  #数据库中存在相应信息，直接返回
-            # ctx = Taobao.objects.filter(taobao_id=taobao_id[0]).values('taobao_name')
-            #
+
             #取结果
-            ctx = "正在读取结果"
+            ctx = taobao_id[0]
             return HttpResponse(ctx)
-            #
+
 
             start_thread_spider(taobao_id[0])  #防止意外存入taobao未存入spider
             return HttpResponse(ctx)
@@ -61,10 +69,13 @@ def search_post(request):  # 接收ajax
             taobao_add.taobao_name = taobao_name[0]
             taobao_add.save()
 
+            # 加入线程池
             start_thread_spider(taobao_id[0])
-            ctx = "未找到结果，等待分析，请稍后再试"
-            #加入线程池
-
+            email_result = save_email(taobao_id[0],email)
+            if email_result:
+                ctx = "未找到结果，等待分析，请及时查看邮箱"
+            else:
+                ctx = "未找到结果，等待分析，请稍后再试，若想及时得到信息，请勾选并输入邮箱"
 
             return HttpResponse(ctx)
 
@@ -73,3 +84,18 @@ def search_post(request):  # 接收ajax
     ctx = "不支持的方法"
     return HttpResponse(ctx)
 
+
+
+def save_email(taobao_id, email):
+    if email == "none":
+        return 0
+    else:
+        if_mail = Mail.objects.filter(taobao_id=taobao_id, mail=email)
+        if if_mail:
+            return 0
+        else:
+            mail = Mail()
+            mail.taobao_id=taobao_id
+            mail.mail=email
+            mail.save()
+        return 1

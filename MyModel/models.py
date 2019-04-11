@@ -36,3 +36,8 @@ class Analyse(models.Model):   #评论分析结果
     analyse_positive_prob = models.TextField()
     analyse_negative_prob = models.TextField()
     analyse_time = models.DateField(auto_now_add=True)
+
+class Mail(models.Model):   #邮件-宝贝id
+    taobao_id = models.CharField(max_length=50)
+    mail = models.CharField(max_length=100)
+    add_time = models.DateField(auto_now_add=True)

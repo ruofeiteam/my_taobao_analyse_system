@@ -1,5 +1,6 @@
 from MyModel.models import Analyse
 from MyModel.models import Spider
+from MyModel.models import Taobao
 from django.shortcuts import render
 from django.http import HttpResponse
 import re
@@ -23,6 +24,13 @@ def get_piejson(taobao_id):
         print("总体评价查询不存在")
         return None
 
+def get_taobao_name(taobao_id):
+    try:
+        taobao = Taobao.objects.get(taobao_id=taobao_id)
+        return taobao.taobao_name
+    except Taobao.DoesNotExist:
+        print("宝贝名称查询不存在")
+        return None
 
 def get_json_url(request):
     if request.GET:
@@ -82,6 +90,12 @@ def get_iframe_html(request):
             lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo/2), lo*2, lo)
             piecolor = piecolor.__add__(lo_color)
         context['piecolor'] = piecolor
+
+        #准备宝贝名称
+        taobao_name = get_taobao_name(taobao_id)
+        print(taobao_name)
+
+        context['taobao_name'] = taobao_name
 
         return render(request, 'get_more_analyse.html', context)
     return HttpResponse("未获取ID")
