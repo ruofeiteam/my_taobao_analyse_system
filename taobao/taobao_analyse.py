@@ -4,6 +4,8 @@ import threading
 
 from MyModel.models import Analyse
 
+from .send_mail import get_mail
+
 
 def start_analyse(list_content,taobao_id):
     exclude = ["评价方未及时做出评价,系统默认好评!", "此用户没有填写评价。", "系统默认评论"]
@@ -33,6 +35,10 @@ def start_analyse(list_content,taobao_id):
         analyse_add.analyse_positive_prob = positive_prob
         analyse_add.save()
         print("分析数据保存完毕")
+
+
+        #发送邮件
+        get_mail(taobao_id)
 
 
 

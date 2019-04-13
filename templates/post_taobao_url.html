@@ -9,7 +9,7 @@
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style>
-    .box{width: 800px;height: auto;margin: 0 auto;}
+    .box{width: 1200px;height: auto;margin: 0 auto;}
     </style>
 
     <script>
@@ -29,8 +29,43 @@
                 setIframeSize(document.getElementById('external-frame'));
             };
 
-        {#AJAX传递URL#}
-        function send_url() {
+        {#接收发送多个url#}
+        function more_url() {
+            urls = $("#input_url").val()
+            for (let url of my_split(urls)){
+                send_url(url)
+            }
+
+        }
+
+        {#改写split函数#}
+        function my_split(urls) {
+            var temp = urls.split(/[\n,]/g);
+            for (var i = 0;i < urls.length; i++){
+                if (temp[i] == ""){
+                    temp.split(i ,1);
+                    {#删除数组中空值#}
+                    i--;
+                }
+            }
+            return temp
+        }
+
+        {#AJAX传递URL,单条url方法#}
+        function send_url(url) {
+            if (url == "")
+            {
+                alert("请输入url");
+                return
+            }
+            else {
+                if(url.substring(0,37) == "https://item.taobao.com/item.htm?spm="){
+                    console.log("url格式正确")
+                }else {
+                    alert("url格式不正确，请重新输入！")
+                    return
+                }
+            }
             if ($("#cbCheckbox1").val() == "true"){
                 var email = $("#emailinput").val();
                 if (email == ""){
@@ -46,33 +81,36 @@
                         $("#emailinput").val('');
                         return false
                     }else {
-                        ajax_post(email)
+                        ajax_post(url, email)
                     }
                 }
             }else if ($("#cbCheckbox1").val() == "false"){
                 var email = "none"
-                ajax_post(email)
+                ajax_post(url, email)
             }
             else {
                 console.log("准备发送ajax请求时未知错误")
             }
         }
-        function ajax_post(email) {
+
+        function ajax_post(url, email) {
             htmlobj = $.ajax(
                 {
                     url:"get_taobao_url/",
                     timeout:1000,
                     data:{csrfmiddlewaretoken:'{{ csrf_token }}',
-                    taobao_url:$("#input_url").val(),
+                    taobao_url:url,
                     email:email},
                     type:"post",
                     success:function(result) {
                         console.log("发送成功！");
                         console.log(result);
+
                         {#$("#request_id").html(result);#}
                         var patrn = /^(-)?\d+(\.\d+)?$/;
                         if (patrn.exec(result) == null || result == "") {
                             return false
+                            alert(result)
                         } else {
                             $("ol").append("<iframe src=\"analyse/?taobao_id="+result+"\" frameborder=\"0\" scrolling=\"no\" id=\"external-frame\" onload=\"setIframeSize(this)\"></iframe>");
                             console.log("生产iframe成功！");
@@ -80,8 +118,7 @@
                         }
                     }
                 }
-            )
-        }
+            )}
 
         {#清空结果#}
         function clear_iframe() {
@@ -100,12 +137,12 @@
     <form role="form">
 	<div class="form-group">
         <div class="box">
-            <label for="name">请输入URL</label>
+            <label for="name"><h3>请输入URL：输入完整商品URL，若想输入多个商品请以回车分隔</h3></label>
             <textarea class="form-control" rows="8" id="input_url"></textarea>
             <ol2><input type="checkbox" id="cbCheckbox1" value="false" />请勾选以填写邮箱</ol2>
 
             <div>
-                <button type="button" class="btn btn-primary" onclick="send_url()">提交按钮</button>
+                <button type="button" class="btn btn-primary" onclick="more_url()">提交按钮</button>
                 <button type="button" class="btn btn-primary" onclick="clear_iframe()">清除结果</button>
             </div>
         </div>
@@ -113,11 +150,6 @@
         <ol id="ol1"></ol>
 
 	</div>
-
-
-{#        嵌入图表#}
-
-{#        <iframe src="analyse/?taobao_id=569931218730" frameborder="0" scrolling="no" id="external-frame" onload="setIframeSize(this)"></iframe>#}
 
     </form>
 

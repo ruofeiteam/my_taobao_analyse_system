@@ -24,6 +24,7 @@ def get_piejson(taobao_id):
         print("总体评价查询不存在")
         return None
 
+
 def get_taobao_name(taobao_id):
     try:
         taobao = Taobao.objects.get(taobao_id=taobao_id)
@@ -31,6 +32,7 @@ def get_taobao_name(taobao_id):
     except Taobao.DoesNotExist:
         print("宝贝名称查询不存在")
         return None
+
 
 def get_json_url(request):
     if request.GET:
@@ -54,6 +56,12 @@ def get_iframe_html(request):
         if taobao_id == None:
             taobao_id = '569931218730'
 
+        # 准备宝贝名称
+        taobao_name = get_taobao_name(taobao_id)
+        print(taobao_name)
+
+        context['taobao_name'] = taobao_name
+
         # 准备图表数据
         json_bar = get_barjson(taobao_id)
         if json_bar == None:
@@ -63,12 +71,17 @@ def get_iframe_html(request):
         json_bar.sort(key=None, reverse=False)
         # 转str
         barstr = ",".join(json_bar)
-        print("正向情感数组：" + barstr)
+
+        if barstr == "":
+            context['empty_bar'] = "柱状图没有有效的评论数据"
+            print("正向情感数组为空")
+        else:
+            print("正向情感数组：" + barstr)
         context['barlables'] = context['bardata'] = barstr
         # 准备图表颜色
         barcolor = ""
         ran_num = round(random.uniform(0, 255))
-        for co in json_bar:
+        for co in range(len(json_bar)):
             co = round(float(co) * 255)
             co_color = "'rgba({0}, {1}, {2}, 0.8)',".format(255 - co, co, ran_num)
             barcolor = barcolor.__add__(co_color)
@@ -78,24 +91,26 @@ def get_iframe_html(request):
         json_pie = get_piejson(taobao_id)
         if json_pie == None:
             return HttpResponse("饼图ID错误")
-        print("总体评价：" + json_pie)
+
         pie_title = re.findall(r"\"title\":\"(.+?)\"", json_pie)
         pie_value = re.findall(r"\{\"count\":(.+?),\"", json_pie)
+        if len(pie_value) == 0:
+            context['empty_pie'] = "饼图没有有效的评价数据"
+            print("总体评价数组为空")
+        else:
+            print("总体评价分类：" + str(pie_title))
+            print("总体评价数值：" + str(pie_value))
         context['pielables'] = pie_title
         context['piedata'] = pie_value
 
+
+
         piecolor = ""
-        for lo in pie_value:
-            lo = round(random.uniform(0,0.1) * 2550)
-            lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo/2), lo*2, lo)
+        for lo in range(len(json_bar)):
+            lo = round(random.uniform(0, 0.1) * 2550)
+            lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo / 2), lo * 2, lo)
             piecolor = piecolor.__add__(lo_color)
         context['piecolor'] = piecolor
-
-        #准备宝贝名称
-        taobao_name = get_taobao_name(taobao_id)
-        print(taobao_name)
-
-        context['taobao_name'] = taobao_name
 
         return render(request, 'get_more_analyse.html', context)
     return HttpResponse("未获取ID")
