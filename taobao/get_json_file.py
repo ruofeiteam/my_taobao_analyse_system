@@ -87,7 +87,7 @@ def get_iframe_html(request):
             barcolor = barcolor.__add__(co_color)
         context['barcolor'] = barcolor
 
-        # 准备饼图数据
+        # 准备评价饼图数据
         json_pie = get_piejson(taobao_id)
         if json_pie == None:
             return HttpResponse("饼图ID错误")
@@ -95,22 +95,41 @@ def get_iframe_html(request):
         pie_title = re.findall(r"\"title\":\"(.+?)\"", json_pie)
         pie_value = re.findall(r"\{\"count\":(.+?),\"", json_pie)
         if len(pie_value) == 0:
-            context['empty_pie'] = "饼图没有有效的评价数据"
+            context['empty_pie'] = "总体评价饼图没有有效的评价数据"
             print("总体评价数组为空")
         else:
             print("总体评价分类：" + str(pie_title))
             print("总体评价数值：" + str(pie_value))
         context['pielables'] = pie_title
         context['piedata'] = pie_value
-
-
-
+        # 准备评价饼图颜色
         piecolor = ""
         for lo in range(len(json_bar)):
             lo = round(random.uniform(0, 0.1) * 2550)
-            lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo / 2), lo * 2, lo)
+            lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo / 2) % 255, lo * 2 % 255, lo % 255)
             piecolor = piecolor.__add__(lo_color)
         context['piecolor'] = piecolor
+
+        # 准备好中差评数据
+        pie_good_data = re.findall(r"\"good\":(.+?),\"", json_pie)
+        pie_normal_data = re.findall(r"\"normal\":(.+?),\"", json_pie)
+        pie_bad_data = re.findall(r"\"bad\":(.+?),\"", json_pie)
+        threedata = pie_good_data + pie_normal_data + pie_bad_data
+        if len(threedata) != 3:
+            context['empty_three'] = "好中差评饼图没有有效的评价数据"
+            print("好评、中评、差评数组为空")
+        else:
+            print("好中差评数据：" + str(threedata))
+        context['threelables'] = ['好评', '中评', '差评']
+        context['threedata'] = threedata
+        # 准备好中差评饼图颜色
+        threecolor = ""
+        for ro in range(3):
+            ro = round(random.uniform(0, 0.1) * 2550)
+            ro_color = "'rgba({0}, {1}, {2}, 0.8)',".format(ro % 255, ro * 2 % 255, round(255 - ro / 2) % 255)
+            threecolor = threecolor.__add__(ro_color)
+        print(threecolor)
+        context['threecolor'] = threecolor
 
         return render(request, 'get_more_analyse.html', context)
     return HttpResponse("未获取ID")

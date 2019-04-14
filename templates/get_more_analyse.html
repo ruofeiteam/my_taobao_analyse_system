@@ -18,15 +18,18 @@
     </style>
 
 </head>
-<body>
+<body background="http://pic.58pic.com/58pic/15/82/38/18P58PIChcB_1024.jpg">
 
     {% csrf_token %}
+
     <div><p>{{ taobao_name }}</p></div>
     <div><p>{{ empty_bar }}</p></div>
     <div><p>{{ empty_pie }}</p></div>
+    <div><p>{{ empty_three }}</p></div>
 {#    创建容器#}
     <div id="abcd"><canvas id="popChart"></canvas></div>
     <div id="abcd"><canvas id="pieChart"></canvas></div>
+    <div id="abcd"><canvas id="threeChart"></canvas></div>
 
     <script>
         {#画柱状图#}
@@ -50,13 +53,13 @@
                 legend:{display:false},
                 title: {
                     display: true,
-                    text: '好评度分布'
+                    text: '好评度分布图'
                 }
             }
         });
 
 
-        {#画饼图#}
+        {#画总体评价饼图#}
         var pieCanvas = document.getElementById("pieChart").getContext("2d");
         var pieChart = new Chart(pieCanvas, {
             type: 'pie',
@@ -72,8 +75,43 @@
                     {% endautoescape %}
                 ]
               }]
+            },
+            options:{
+                legend:{display:true},
+                title: {
+                    display: true,
+                    text: '整体评价分布图'
+                }
             }
         });
+
+        {#画好中差评价饼图#}
+        var threeCanvas = document.getElementById("threeChart").getContext("2d");
+        var threeChart = new Chart(threeCanvas, {
+            type: 'pie',
+            data: {
+              labels: {% autoescape off %}{{ threelables }}{% endautoescape %},
+              datasets: [{
+                fillColor : "rgba(220,220,220,0.5)",
+                label: '评分',
+                data: {% autoescape off %}{{ threedata }}{% endautoescape %},
+                backgroundColor: [
+                    {% autoescape off %}
+                    {{ threecolor }}
+                    {% endautoescape %}
+                ]
+              }]
+            },
+            options:{
+                legend:{display:true},
+                title: {
+                    display: true,
+                    text: '好评、中评、差评分布图'
+                }
+            }
+        });
+
+
 
 
     </script>

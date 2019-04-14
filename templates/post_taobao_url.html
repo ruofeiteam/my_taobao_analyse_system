@@ -34,16 +34,17 @@
             urls = $("#input_url").val()
             for (let url of my_split(urls)){
                 send_url(url)
+                console.log(url)
             }
 
         }
 
         {#改写split函数#}
         function my_split(urls) {
-            var temp = urls.split(/[\n,]/g);
+            var temp = urls.split(/[\n,，;；]/g);
             for (var i = 0;i < urls.length; i++){
                 if (temp[i] == ""){
-                    temp.split(i ,1);
+                    temp.splice(i ,1);
                     {#删除数组中空值#}
                     i--;
                 }
@@ -137,7 +138,7 @@
     <form role="form">
 	<div class="form-group">
         <div class="box">
-            <label for="name"><h3>请输入URL：输入完整商品URL，若想输入多个商品请以回车分隔</h3></label>
+            <label for="name"><h3>请输入URL：输入完整商品URL，若想输入多个商品请以回车、分号或者逗号分隔（不区分半、全角）</h3></label>
             <textarea class="form-control" rows="8" id="input_url"></textarea>
             <ol2><input type="checkbox" id="cbCheckbox1" value="false" />请勾选以填写邮箱</ol2>
 
