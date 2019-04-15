@@ -24,7 +24,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', get_taobao_url.mian_taobao),
+    path('', get_taobao_url.main_taobao),
     # path('get_taobao_url/', get_taobao_url.search_post),
     path('get_taobao_url/', get_taobao_url.more_post),
     path('get_json/',get_json_file.get_json_url),

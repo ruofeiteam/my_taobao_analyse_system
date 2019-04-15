@@ -2,12 +2,17 @@ from MyModel.models import Mail
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
+import os, configparser
+
 
 def send(taobao_id, mail):
+    # 读config.ini文件
+    dir_now = os.path.dirname(__file__)
+    conf = configparser.ConfigParser()
+    conf.read(dir_now + '/config.ini')
 
-
-    my_sender = '815975902@qq.com'  # 发件人邮箱账号
-    my_pass = 'gueerdqvhjufbbha'  # 发件人邮箱密码(当时申请smtp给的口令)
+    my_sender = conf.get('mail', 'user')  # 发件人邮箱账号
+    my_pass = conf.get('mail', 'passwd')  # 发件人邮箱密码(当时申请smtp给的口令)
     my_user = mail  # 收件人邮箱账号，我这边发送给自己
 
     def mail():
@@ -41,6 +46,4 @@ def get_mail(taobao_id):
 
     for e in mail:
         print(e.mail)
-        send(taobao_id,e.mail)
-
-
+        send(taobao_id, e.mail)

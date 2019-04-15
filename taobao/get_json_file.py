@@ -54,7 +54,7 @@ def get_iframe_html(request):
         taobao_id = request.GET['taobao_id']
         print("get_id：" + taobao_id)
         if taobao_id == None:
-            taobao_id = '569931218730'
+            return HttpResponse("未获取ID")
 
         # 准备宝贝名称
         taobao_name = get_taobao_name(taobao_id)
@@ -132,4 +132,4 @@ def get_iframe_html(request):
         context['threecolor'] = threecolor
 
         return render(request, 'get_more_analyse.html', context)
-    return HttpResponse("未获取ID")
+    return HttpResponse("未知错误操作")

@@ -60,7 +60,8 @@
                 return
             }
             else {
-                if(url.substring(0,37) == "https://item.taobao.com/item.htm?spm="){
+                var check_url = "{{ check_url }}"
+                if(url.substring(0,check_url.length) == check_url){
                     console.log("url格式正确")
                 }else {
                     alert("url格式不正确，请重新输入！")

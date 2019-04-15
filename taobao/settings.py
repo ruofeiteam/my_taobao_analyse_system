@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
+import configparser, os
+
+# 读config.ini文件
+dir_now = os.path.dirname(__file__)
+conf = configparser.ConfigParser()
+conf.read(dir_now + '/config.ini')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -27,7 +31,6 @@ DEBUG = True
 # DEBUG = False
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -72,25 +75,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'taobao.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
     'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'DEMO',
-            'USER': 'debian-sys-maint',
-            'PASSWORD': 'chen@366@',
-            'HOST': '118.25.101.157',
-            'PORT': '3306',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': conf.get('database', 'name'),
+        'USER': conf.get('database', 'user'),
+        'PASSWORD': conf.get('database', 'passwd'),
+        'HOST': conf.get('database', 'host'),
+        'PORT': conf.get('database', 'port'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -110,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -123,7 +120,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

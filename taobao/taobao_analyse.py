@@ -6,15 +6,17 @@ from MyModel.models import Analyse
 
 from .send_mail import get_mail
 
+import os, configparser
 
-def start_analyse(list_content,taobao_id):
+
+def start_analyse(list_content, taobao_id):
     exclude = ["评价方未及时做出评价,系统默认好评!", "此用户没有填写评价。", "系统默认评论"]
     positive_prob = []
     negative_prob = []
     for text in list_content:
         if text in exclude:
             continue
-        else:   ##{'positive_prob': 0.463763, 'confidence': 0.275252, 'negative_prob': 0.536237, 'sentiment': 1}
+        else:  ##{'positive_prob': 0.463763, 'confidence': 0.275252, 'negative_prob': 0.536237, 'sentiment': 1}
             text_items = sentiment_classify(text)['items'][0]
             text_positive_prob = text_items['positive_prob']
             positive_prob.append(text_positive_prob)
@@ -36,10 +38,8 @@ def start_analyse(list_content,taobao_id):
         analyse_add.save()
         print("分析数据保存完毕")
 
-
-        #发送邮件
+        # 发送邮件
         get_mail(taobao_id)
-
 
 
 import json, urllib
@@ -52,11 +52,19 @@ def sentiment_classify(text):
     参数：
     text:str 本文
     """
+    # 读config.ini文件
+    dir_now = os.path.dirname(__file__)
+    conf = configparser.ConfigParser()
+    conf.read(dir_now + '/config.ini')
+
+
     raw = {"text": "内容"}
     raw['text'] = text
     data = json.dumps(raw).encode('utf-8')
-    AT = "24.8a7698581e69872e18cff7218673be26.2592000.1556000633.282335-15834712"
-    host = "https://aip.baidubce.com/rpc/2.0/nlp/v1/sentiment_classify?charset=UTF-8&access_token=" + AT
+    AT = conf.get('baidu', 'AT')
+    host = conf.get('baidu', 'host') + AT
+    # AT = "24.8a7698581e69872e18cff7218673be26.2592000.1556000633.282335-15834712"
+    # host = "https://aip.baidubce.com/rpc/2.0/nlp/v1/sentiment_classify?charset=UTF-8&access_token=" + AT
     request = urllib.request.Request(url=host, data=data)
     request.add_header('Content-Type', 'application/json')
     response = urllib.request.urlopen(request)
@@ -66,7 +74,7 @@ def sentiment_classify(text):
 
 
 class myThread(threading.Thread):
-    def __init__(self, list_content,taobao_id):
+    def __init__(self, list_content, taobao_id):
         threading.Thread.__init__(self)
         self.list_content = list_content
         self.taobao_id = taobao_id
@@ -75,7 +83,7 @@ class myThread(threading.Thread):
         print("开启分析线程： " + self.name)
         # 获取锁，用于线程同步
         threadLock.acquire()
-        start_analyse(self.list_content,self.taobao_id)
+        start_analyse(self.list_content, self.taobao_id)
         # 释放锁，开启下一个线程
         threadLock.release()
 
@@ -84,9 +92,9 @@ threadLock = threading.Lock()
 threads = []
 
 
-def start_thread_analyse(list_content,taobao_id):
+def start_thread_analyse(list_content, taobao_id):
     # 创建新线程
-    thread = myThread(list_content,taobao_id)
+    thread = myThread(list_content, taobao_id)
 
     # 开启新线程
     thread.start()

@@ -9,11 +9,22 @@ from MyModel.models import Mail
 from django.http import HttpResponse
 from .taobao_spider import start_thread_spider
 
+import configparser, os
 
-def mian_taobao(request):
-    return render(request, "post_taobao_url.html")
+# 读config.ini文件
+dir_now = os.path.dirname(__file__)
+conf = configparser.ConfigParser()
+conf.read(dir_now + '/config.ini')
 
-def more_post(request):  #接收多条输入
+
+def main_taobao(request):
+    context = {}
+    context['check_url'] = conf.get('taobao', 'url')
+    return render(request, 'post_taobao_url.html', context)
+    # return render(request, "post_taobao_url.html")
+
+
+def more_post(request):  # 接收多条输入
     if request.POST:
         urls = request.POST['taobao_url']
         email = request.POST['email']
@@ -24,11 +35,12 @@ def more_post(request):  #接收多条输入
         ctx = "more时未知错误"
         return HttpResponse(ctx)
 
+
 def do_url(taobao_url, email):  # 分离url处理方法
 
-    if_taobao_url = r"https://item.taobao.com/item.htm"  # 判断是否为正确url
+    # if_taobao_url = r"https://item.taobao.com/item.htm"  # 判断是否为正确url
+    if_taobao_url = conf.get('taobao', 'url')  # 判断是否为正确url
     if if_taobao_url != taobao_url[0:len(if_taobao_url)]:
-
         ctx = "Not a valid URL,当前仅支持淘宝评论分析"
         return ctx
 
@@ -51,16 +63,16 @@ def do_url(taobao_url, email):  # 分离url处理方法
     taobao_id = re.findall(r"itemId           : \'(.+?)\'\,", taobao_detail)
 
     if_new_taobao_id = Taobao.objects.filter(taobao_id=taobao_id[0])
-    if if_new_taobao_id:  #数据库中存在相应信息，直接返回
+    if if_new_taobao_id:  # 数据库中存在相应信息，直接返回
 
-        #取结果
+        # 取结果
         ctx = taobao_id[0]
         return ctx
 
-        start_thread_spider(taobao_id[0])  #防止意外存入taobao未存入spider
+        start_thread_spider(taobao_id[0])  # 防止意外存入taobao未存入spider
         ctx = "取结果时未知错误"
         return ctx
-    else:             #不存在，加入数据库，加入爬取池
+    else:  # 不存在，加入数据库，加入爬取池
         taobao_add = Taobao()
         taobao_add.taobao_price_now = taobao_price_now[0]
         taobao_add.taobao_shop_name = taobao_shop_name[0]
@@ -71,8 +83,8 @@ def do_url(taobao_url, email):  # 分离url处理方法
 
         # 加入线程池
         start_thread_spider(taobao_id[0])
-        #加入邮箱
-        email_result = save_email(taobao_id[0],email)
+        # 加入邮箱
+        email_result = save_email(taobao_id[0], email)
         if email_result:
             ctx = "未找到结果，等待分析，请及时查看邮箱"
         else:
@@ -91,9 +103,9 @@ def search_post(request):  # 接收ajax，高耦合，已抛弃使用
         email = request.POST['email']
         print("email：" + email)
 
-        if_taobao_url = r"https://item.taobao.com/item.htm"  # 判断是否为正确url
+        # if_taobao_url = r"https://item.taobao.com/item.htm"  # 判断是否为正确url
+        if_taobao_url = conf.get('taobao', 'url')
         if if_taobao_url != taobao_url[0:len(if_taobao_url)]:
-
             ctx = "Not a valid URL,当前仅支持淘宝评论分析"
             return HttpResponse(ctx)
 
@@ -116,16 +128,15 @@ def search_post(request):  # 接收ajax，高耦合，已抛弃使用
         taobao_id = re.findall(r"itemId           : \'(.+?)\'\,", taobao_detail)
 
         if_new_taobao_id = Taobao.objects.filter(taobao_id=taobao_id[0])
-        if if_new_taobao_id:  #数据库中存在相应信息，直接返回
+        if if_new_taobao_id:  # 数据库中存在相应信息，直接返回
 
-            #取结果
+            # 取结果
             ctx = taobao_id[0]
             return HttpResponse(ctx)
 
-
-            start_thread_spider(taobao_id[0])  #防止意外存入taobao未存入spider
+            start_thread_spider(taobao_id[0])  # 防止意外存入taobao未存入spider
             return HttpResponse(ctx)
-        else:             #不存在，加入数据库，加入爬取池
+        else:  # 不存在，加入数据库，加入爬取池
             taobao_add = Taobao()
             taobao_add.taobao_price_now = taobao_price_now[0]
             taobao_add.taobao_shop_name = taobao_shop_name[0]
@@ -136,8 +147,8 @@ def search_post(request):  # 接收ajax，高耦合，已抛弃使用
 
             # 加入线程池
             start_thread_spider(taobao_id[0])
-            #加入邮箱
-            email_result = save_email(taobao_id[0],email)
+            # 加入邮箱
+            email_result = save_email(taobao_id[0], email)
             if email_result:
                 ctx = "未找到结果，等待分析，请及时查看邮箱"
             else:
@@ -151,7 +162,7 @@ def search_post(request):  # 接收ajax，高耦合，已抛弃使用
     return HttpResponse(ctx)
 
 
-#保存待发送的邮箱
+# 保存待发送的邮箱
 def save_email(taobao_id, email):
     if email == "none":
         return 0
@@ -161,7 +172,7 @@ def save_email(taobao_id, email):
             return 0
         else:
             mail = Mail()
-            mail.taobao_id=taobao_id
-            mail.mail=email
+            mail.taobao_id = taobao_id
+            mail.mail = email
             mail.save()
         return 1
