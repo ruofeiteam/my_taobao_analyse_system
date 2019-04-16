@@ -25,12 +25,12 @@ def get_piejson(taobao_id):
         return None
 
 
-def get_taobao_name(taobao_id):
+def get_taobao(taobao_id):
     try:
         taobao = Taobao.objects.get(taobao_id=taobao_id)
-        return taobao.taobao_name
+        return taobao.taobao_name, taobao.taobao_price_now, taobao.taobao_time
     except Taobao.DoesNotExist:
-        print("宝贝名称查询不存在")
+        print("宝贝名称、价格、时间查询不存在")
         return None
 
 
@@ -56,11 +56,13 @@ def get_iframe_html(request):
         if taobao_id == None:
             return HttpResponse("未获取ID")
 
-        # 准备宝贝名称
-        taobao_name = get_taobao_name(taobao_id)
-        print(taobao_name)
+        # 准备宝贝名称、价格、时间
+        taobao_name, taobao_price, taobao_time = get_taobao(taobao_id)
+        print(taobao_name, taobao_price, taobao_time)
 
         context['taobao_name'] = taobao_name
+        context['taobao_price'] = taobao_price
+        context['taobao_time'] = taobao_time
 
         # 准备图表数据
         json_bar = get_barjson(taobao_id)

@@ -21,7 +21,6 @@ from . import get_json_file
 from django.views.generic.base import RedirectView
 
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', get_taobao_url.main_taobao),

@@ -22,7 +22,9 @@
 
     {% csrf_token %}
 
-    <div><p>{{ taobao_name }}</p></div>
+    <div><p>商品名称：{{ taobao_name }}</p></div>
+    <div><p>商品价格：{{ taobao_price }}元</p></div>
+    <div><p>获取的时间：{{ taobao_time }}</p></div>
     <div><p>{{ empty_bar }}</p></div>
     <div><p>{{ empty_pie }}</p></div>
     <div><p>{{ empty_three }}</p></div>
