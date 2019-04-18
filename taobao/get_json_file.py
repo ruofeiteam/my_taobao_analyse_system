@@ -3,8 +3,10 @@ from MyModel.models import Spider
 from MyModel.models import Taobao
 from django.shortcuts import render
 from django.http import HttpResponse
+import requests
 import re
 import random
+import math
 
 
 def get_barjson(taobao_id):
@@ -34,6 +36,34 @@ def get_taobao(taobao_id):
         return None
 
 
+def get_history_price(taobao_id):
+    taobao_url = "http://www.xitie.com/tmall.php?no=" + taobao_id
+    r = requests.get(taobao_url, allow_redirects=False)
+    text = r.text
+    error_text = "您输入的编号有错误"
+    if error_text in text:
+        return None, None
+    data = re.findall(r"data: \[(.+?)\]", text)
+    time = re.findall(r"categories: \[(.+?)\]", text)
+
+    datas = data[0].split(',')
+
+    newlist = []
+    for i in datas:
+        newlist.append(float(i))
+
+    min_data = math.floor(min(newlist) / pow(10, len(str(math.floor(min(newlist)))) - 1)) * pow(10, len(
+        str(math.floor(min(newlist)))) - 1)
+    max_data = math.ceil(max(newlist) / pow(10, len(str(math.ceil(max(newlist)))) - 1)) * pow(10, len(
+        str(math.ceil(max(newlist)))) - 1)
+
+    newlist.append(min_data)
+    newlist.append(max_data)
+    print(newlist)
+
+    return str(newlist), str(time)[2:-2]
+
+
 def get_json_url(request):
     if request.GET:
         taobao_id = request.GET['taobao_id']
@@ -59,6 +89,8 @@ def get_iframe_html(request):
         # 准备宝贝名称、价格、时间
         taobao_name, taobao_price, taobao_time = get_taobao(taobao_id)
         print(taobao_name, taobao_price, taobao_time)
+
+        context['taobao_id'] = taobao_id
 
         context['taobao_name'] = taobao_name
         context['taobao_price'] = taobao_price
@@ -132,6 +164,13 @@ def get_iframe_html(request):
             threecolor = threecolor.__add__(ro_color)
         print(threecolor)
         context['threecolor'] = threecolor
+
+        # 准备历史价格数据
+        context['pointdata'], context['pointlables'] = get_history_price(taobao_id)
+        if context['pointdata'] == None or context['pointlables'] == None:
+            context['empty_point'] = "商品没有有效的历史价格数据"
+        ho = round(random.uniform(0, 0.1) * 2550)
+        context['pointcolor'] = "'rgba({0}, {1}, {2}, 0.8)',".format(ho % 255, ho * 2 % 255, round(255 - ho / 2) % 255)
 
         return render(request, 'get_more_analyse.html', context)
     return HttpResponse("未知错误操作")

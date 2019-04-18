@@ -23,15 +23,18 @@
     {% csrf_token %}
 
     <div><p>商品名称：{{ taobao_name }}</p></div>
-    <div><p>商品价格：{{ taobao_price }}元</p></div>
-    <div><p>获取的时间：{{ taobao_time }}</p></div>
+    <div><p>收录时的商品价格：{{ taobao_price }}元</p></div>
+    <div><p>收录的时间：{{ taobao_time }}</p></div>
     <div><p>{{ empty_bar }}</p></div>
     <div><p>{{ empty_pie }}</p></div>
     <div><p>{{ empty_three }}</p></div>
+    <div><p>{{ empty_point }}</p></div>
+
 {#    创建容器#}
     <div id="abcd"><canvas id="popChart"></canvas></div>
     <div id="abcd"><canvas id="pieChart"></canvas></div>
     <div id="abcd"><canvas id="threeChart"></canvas></div>
+    <div id="abcd"><canvas id="pointChart"></canvas></div>
 
     <script>
         {#画柱状图#}
@@ -109,6 +112,33 @@
                 title: {
                     display: true,
                     text: '好评、中评、差评分布图'
+                }
+            }
+        });
+
+
+          {#画好中差评价饼图#}
+        var pointCanvas = document.getElementById("pointChart").getContext("2d");
+        var pointChart = new Chart(pointCanvas, {
+            type: 'line',
+            data: {
+                labels: [{% autoescape off %}{{ pointlables }}{% endautoescape %}],
+                datasets: [{
+                    fillColor : "rgba(220,220,220,0.5)",
+                    label: '历史价格',
+                    data: {% autoescape off %}{{ pointdata }}{% endautoescape %},
+                    backgroundColor: [
+                        {% autoescape off %}
+                            {{ pointcolor }}
+                        {% endautoescape %}
+                    ]
+                }]
+            },
+            options:{
+                legend:{display:false},
+                title: {
+                    display: true,
+                    text: '历史价格折线图'
                 }
             }
         });
