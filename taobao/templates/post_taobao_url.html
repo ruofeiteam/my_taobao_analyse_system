@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -9,9 +10,10 @@
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style>
-    .box{width: 1200px;height: auto;margin: 0 auto;}
+    .box{width: 90%;height: auto;margin: 0 auto;margin-top: 3%;text-align: center;}
+    .email{width: 90%;height: auto;margin: 0 auto;margin-top: 0%;margin-left: -20%; font-size: 120%;}
+    .email2{width: 90%;height: auto;margin: 0 auto;margin-top: 0%;margin-left: 30%; font-size: 100%;}
     </style>
-
     <script>
 
         {#设置iframe自动适应高度宽度#}
@@ -111,8 +113,8 @@
                         {#$("#request_id").html(result);#}
                         var patrn = /^(-)?\d+(\.\d+)?$/;
                         if (patrn.exec(result) == null || result == "") {
-                            return false
                             alert(result)
+                            return true
                         } else {
                             $("ol").append("<iframe src=\"analyse/?taobao_id="+result+"\" frameborder=\"0\" scrolling=\"no\" id=\"external-frame\" onload=\"setIframeSize(this)\"></iframe>");
                             console.log("生产iframe成功！");
@@ -131,7 +133,7 @@
         }
     </script>
 </head>
-<body>
+<body style="background-image: url({% static 'images/背景.jpg' %});background-size:cover">
     {% csrf_token %}
 
 
@@ -141,11 +143,11 @@
         <div class="box">
             <label for="name"><h3>请输入URL：输入完整商品URL，若想输入多个商品请以回车、分号或者逗号分隔（不区分半、全角）</h3></label>
             <textarea class="form-control" rows="8" id="input_url"></textarea>
-            <ol2><input type="checkbox" id="cbCheckbox1" value="false" />请勾选以填写邮箱</ol2>
-
+            <div><div class="email"><ol2><input type="checkbox" id="cbCheckbox1" value="false" />请勾选以填写邮箱</ol2></div>
+            </div>
             <div>
-                <button type="button" class="btn btn-primary" onclick="more_url()">提交按钮</button>
-                <button type="button" class="btn btn-primary" onclick="clear_iframe()">清除结果</button>
+                <button type="button" class="btn btn-primary" style="margin-left: -10%" onclick="more_url()">提交按钮</button>
+                <button type="button" class="btn btn-primary" style="margin-left: 10%" onclick="clear_iframe()">清除结果</button>
             </div>
         </div>
         <p id="request_id"></p>
@@ -162,7 +164,7 @@
 
     $("#cbCheckbox1").click(function () {
         if ($(this).prop("checked")) {
-        	$("ol2").append("<div id = \"divbr\">在此处填写您的邮箱，将会在分析结束后及时得到邮件提醒：<input type=\"email\" id=\"emailinput\" placeholder=\"test@example.com\"></div>")
+        	$("ol2").append("<div id = \"divbr\" class=\"email2\">在此处填写您的邮箱，将会在分析结束后及时得到邮件提醒：<input type=\"email\" id=\"emailinput\" placeholder=\"test@example.com\"></div>")
             $("#cbCheckbox1").val("true");
         } else {
             $("#divbr").remove();
