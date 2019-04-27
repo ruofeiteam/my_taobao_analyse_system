@@ -88,8 +88,6 @@ def sentiment_classify(text):
     dir_now = os.path.dirname(__file__)
     conf = configparser.ConfigParser()
     conf.read(dir_now + '/config.ini')
-
-
     raw = {"text": "内容"}
     raw['text'] = text
     data = json.dumps(raw).encode('utf-8')
@@ -102,6 +100,7 @@ def sentiment_classify(text):
     response = urllib.request.urlopen(request)
     content = response.read().decode('utf-8')
     rdata = json.loads(content)
+    # print("百度Al返回" + str(rdata))
     return rdata
 
 
