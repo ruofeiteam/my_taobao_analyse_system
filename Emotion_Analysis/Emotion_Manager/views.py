@@ -29,7 +29,6 @@ def calculate_accuracy(request):
         text = re.sub("[\s+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）～-]+", "", text)
         pos_list = jieba.cut(text, cut_all=False)
         res = CEA.application(CEA.transfer_text_to_moto(list(pos_list)))
-
         print("基于机器学习：" + str(res))
 
         return HttpResponse(res)
@@ -41,8 +40,9 @@ def calculate_accuracy(request):
         return HttpResponse(score)
     elif type == 'SnowNLP':
         return HttpResponse(SnowNLP(text).sentiments)
-    elif type == "BaiduAl":
+    elif type == "BaiduAl": #系统中直接实现未迁移
         pass
+
 
 
 def dict_result(request):
