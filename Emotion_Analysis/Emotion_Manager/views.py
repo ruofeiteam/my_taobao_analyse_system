@@ -6,6 +6,7 @@ from django.shortcuts import render
 import Emotion_Manager.CEA_LIB.chinese_emotion_analysis as CEA
 from Emotion_Manager.Modules.main import getScoreFromString
 from snownlp import SnowNLP
+from Emotion_Manager.BaiduAl.baiduAl import sentiment_classify as baiduAl
 # Create your views here.
 
 
@@ -40,8 +41,8 @@ def calculate_accuracy(request):
         return HttpResponse(score)
     elif type == 'SnowNLP':
         return HttpResponse(SnowNLP(text).sentiments)
-    elif type == "BaiduAl": #系统中直接实现未迁移
-        pass
+    elif type == "BaiduAl": #未测试
+        return HttpResponse(baiduAl(text))
 
 
 

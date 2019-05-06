@@ -115,10 +115,51 @@ def get_iframe_html(request):
         else:
             print("正向情感数组：" + barstr)
         context['barlables'] = context['bardata'] = barstr
+###############################################################
+        # 新的评论分析图
+        newjson_bar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for i in json_bar:
+            i = float(i)
+            if 0 <= i < 0.1:
+                newjson_bar[0] += 1
+            if 0.1 <= i < 0.2:
+                newjson_bar[1] += 1
+            if 0.2 <= i < 0.3:
+                newjson_bar[2] += 1
+            if 0.3 <= i < 0.4:
+                newjson_bar[3] += 1
+            if 0.4 <= i < 0.5:
+                newjson_bar[4] += 1
+            if 0.5 <= i < 0.6:
+                newjson_bar[5] += 1
+            if 0.6 <= i < 0.7:
+                newjson_bar[6] += 1
+            if 0.7 <= i < 0.8:
+                newjson_bar[7] += 1
+            if 0.8 <= i < 0.9:
+                newjson_bar[8] += 1
+            if 0.9 <= i <= 1.0:
+                newjson_bar[9] += 1
+        sum = len(json_bar)
+        for i in range(10):
+            newjson_bar[i] = round(newjson_bar[i] / sum * 100)
+        context['newbarlables'] = "'0-0.1','0.1-0.2','0.2-0.3','0.3-0.4','0.4-0.5','0.5-0.6','0.6-0.7','0.7-0.8','0.8-0.9','0.9-1.0'"
+        context['newbardata'] = str(newjson_bar)
+
+        newbarcolor = ""
+        for col in range(0,5):
+            co_color = "'rgba({0}, {1}, {2}, 0.8)',".format(255, 0, math.floor(col * 255 / 10))
+            newbarcolor = newbarcolor.__add__(co_color)
+        for col in range(5,11):
+            co_color = "'rgba({0}, {1}, {2}, 0.8)',".format(0, 255, math.floor(col * 255 / 10))
+            newbarcolor = newbarcolor.__add__(co_color)
+        context['newbarcolor'] = newbarcolor
+#################################################################
+
         # 准备图表颜色
         barcolor = ""
         ran_num = round(random.uniform(0, 255))
-        for co in range(len(json_bar)):
+        for co in json_bar:
             co = round(float(co) * 255)
             co_color = "'rgba({0}, {1}, {2}, 0.8)',".format(255 - co, co, ran_num)
             barcolor = barcolor.__add__(co_color)
@@ -141,7 +182,7 @@ def get_iframe_html(request):
         context['piedata'] = pie_value
         # 准备评价饼图颜色
         piecolor = ""
-        for lo in range(len(json_bar)):
+        for lo in range(len(pie_value)):
             lo = round(random.uniform(0, 0.1) * 2550)
             lo_color = "'rgba({0}, {1}, {2}, 0.8)',".format(round(255 - lo / 2) % 255, lo * 2 % 255, lo % 255)
             piecolor = piecolor.__add__(lo_color)
@@ -160,11 +201,12 @@ def get_iframe_html(request):
         context['threelables'] = ['好评', '中评', '差评']
         context['threedata'] = threedata
         # 准备好中差评饼图颜色
-        threecolor = ""
-        for ro in range(3):
-            ro = round(random.uniform(0, 0.1) * 2550)
-            ro_color = "'rgba({0}, {1}, {2}, 0.8)',".format(ro % 255, ro * 2 % 255, round(255 - ro / 2) % 255)
-            threecolor = threecolor.__add__(ro_color)
+        # threecolor = ""
+        # for ro in range(3):
+        #     ro = round(random.uniform(0, 0.1) * 2550)
+        #     ro_color = "'rgba({0}, {1}, {2}, 0.8)',".format(ro % 255, ro * 2 % 255, round(255 - ro / 2) % 255)
+        #     threecolor = threecolor.__add__(ro_color)
+        threecolor = "'rgba(255, 0, 0, 0.8)','rgba(0, 255, 0, 0.8)','rgba(0, 0, 255, 0.8)'"
         print(threecolor)
         context['threecolor'] = threecolor
 
