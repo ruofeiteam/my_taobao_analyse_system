@@ -32,7 +32,7 @@ def calculate_accuracy(request):
         res = CEA.application(CEA.transfer_text_to_moto(list(pos_list)))
         print("基于机器学习：" + str(res))
 
-        return HttpResponse(res)
+        return HttpResponse(res / 100)
     elif type == 'DIC':
         print(request.GET['dic'])
         dicType = request.GET['dic']
@@ -41,8 +41,9 @@ def calculate_accuracy(request):
         return HttpResponse(score)
     elif type == 'SnowNLP':
         return HttpResponse(SnowNLP(text).sentiments)
-    elif type == "BaiduAl": #未测试
-        return HttpResponse(baiduAl(text))
+    elif type == "BaiduAl":
+        # print(baiduAl(text)['items'][0]['positive_prob'])
+        return HttpResponse(baiduAl(text)['items'][0]['positive_prob'])
 
 
 

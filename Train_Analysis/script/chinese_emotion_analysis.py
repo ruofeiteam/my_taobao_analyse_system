@@ -44,7 +44,7 @@ def bigram_words(words, score_fn=BigramAssocMeasures.chi_sq, n=1000):
     bigram_finder = BigramCollocationFinder.from_words(words)
     bigrams = bigram_finder.nbest(score_fn, n)  # 使用了卡方统计的方法，选择排名前1000的双
 
-    return bag_of_words(tuple_words + bigrams)  # 所有词和（信息量大的）双词搭配一起作为特征
+    return bag_of_words(tuple_words + bigrams)  # 所有词和双词搭配一起作为特征
 
 
 # 特征选择方法
@@ -55,7 +55,7 @@ def create_word_scores():
     negWords = pickle.load(open(neg_f, 'rb'))
 
     posWords = list(itertools.chain(*posWords))  # 把多维数组解链成一维数组
-    negWords = list(itertools.chain(*negWords))  # 同理
+    negWords = list(itertools.chain(*negWords))  
 
     word_fd = FreqDist()  # 可统计所有词的词频
     cond_word_fd = ConditionalFreqDist()  # 可统计积极文本中的词频和消极文本中的词
@@ -73,9 +73,9 @@ def create_word_scores():
     word_scores = {}
     for word, freq in word_fd.items():
         pos_score = BigramAssocMeasures.chi_sq(cond_word_fd['pos'][word], (freq, pos_word_count),
-                                               total_word_count)  # 计算积极词的卡方统计量，这里也可以计算互信息等其它统计量
+                                               total_word_count)  # 计算积极词的卡方统计量
         neg_score = BigramAssocMeasures.chi_sq(cond_word_fd['neg'][word], (freq, neg_word_count),
-                                               total_word_count)  # 同理
+                                               total_word_count)  
         word_scores[word] = pos_score + neg_score  # 一个词的信息量等于积极卡方统计量加上消极卡方统计量
 
     return word_scores  # 包括了每个词和这个词的信息量
@@ -124,7 +124,7 @@ def create_word_bigram_scores():
 # 根据信息量进行倒序排序，选择排名靠前的信息量的词
 def find_best_words(word_scores, number):
     best_vals = sorted(word_scores.items(), key=lambda w_s: w_s[1], reverse=True)[
-        :number]  # 把词按信息量倒序排序。number是特征的维度，是可以不断调整直至最优的
+        :number]  # 把词按信息量倒序排序。
     best_words = set([w for w, s in best_vals])
     return best_words
 

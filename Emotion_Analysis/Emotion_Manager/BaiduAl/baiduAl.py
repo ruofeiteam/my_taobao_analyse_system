@@ -1,3 +1,6 @@
+import requests
+import urllib
+import json
 # 百度Al情感倾向分析
 def sentiment_classify(text):
     """

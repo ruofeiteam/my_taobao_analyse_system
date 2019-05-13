@@ -45,13 +45,11 @@ def All_Spider(taobao_id):  # 获取所有评论
         else:
             break
 
-
-    #加入分析
-    start_thread_analyse(list_content,taobao_id)
+    # 加入分析
+    start_thread_analyse(list_content, taobao_id)
     #
     return (json.dumps(list_content))
     # return (list_content)
-
 
 
 def save_common_mysql(taobao_id):
